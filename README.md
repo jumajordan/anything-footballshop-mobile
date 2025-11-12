@@ -3,53 +3,51 @@ NPM: 2406435843
 Kelas: F
 
 
-## 1. Apa itu widget tree pada Flutter dan bagaimana hubungan parent-child (induk-anak) bekerja antar widget?
-Widget tree adalah **struktur hierarki** dari semua widget yang membentuk antarmuka pengguna (UI) di Flutter.  
-Setiap tampilan di Flutter dibangun dari kombinasi widget — mulai dari widget tingkat tinggi seperti `Scaffold` sampai elemen kecil seperti `Text` atau `Icon`.
+## 1. Jelaskan perbedaan antara Navigator.push() dan Navigator.pushReplacement() pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
 
-Hubungan **parent-child** berarti:
-- **Parent widget** adalah widget yang membungkus (menampung) widget lain di dalamnya.
-- **Child widget** adalah widget yang berada di dalam parent dan menerima konteks, gaya, serta perilaku dari parent-nya.
+### `Navigator.push()`
+- Menambahkan (mendorong) halaman baru ke atas *navigation stack*.
+- Halaman sebelumnya tetap ada di bawahnya, sehingga pengguna bisa kembali dengan tombol "Back".
+- Cocok digunakan untuk transisi normal antar-halaman, misalnya:
+  - Dari halaman daftar produk ke halaman detail produk.
+  - Dari menu utama ke form tambah produk.
 
-## 2. Sebutkan semua widget yang digunakan dalam proyek ini dan jelaskan fungsinya
-| Widget         | Fungsi                                                                        |
-| ---------------| ----------------------------------------------------------------------------- |
-| MaterialApp    | Widget root yang menyediakan tema Material Design dan navigasi aplikasi.      |
-| Scaffold       | Menyediakan struktur dasar halaman (AppBar, body, FloatingActionButton, dll). |
-| AppBar         | Menampilkan bar di bagian atas halaman dengan judul atau tombol.              |
-| Padding        | Memberi jarak di sekitar widget anak.                                         |
-| Column         | Menyusun widget anak secara vertikal.                                         |
-| Row            | Menyusun widget anak secara horizontal.                                       |
-| Center         | Menempatkan widget anak di tengah.                                            |
-| SizedBox       | Memberi jarak atau ruang kosong dengan ukuran tertentu.                       |
-| Card           | Menampilkan elemen berbentuk kartu dengan bayangan.                           |
-| Container      | Widget fleksibel untuk mengatur padding, margin, ukuran, dan dekorasi.        |
-| Text           | Menampilkan teks.                                                             |
-| GridView.count | Menampilkan grid dengan jumlah kolom tetap.                                   |
-| Icon           | Menampilkan ikon dari library Material.                                       |
-| Material       | Memberi efek visual dan tema Material Design pada elemen UI.                  |
-| InkWell        | Memberi efek sentuhan (ripple effect) dan aksi `onTap`.                       |
-| SnackBar       | Menampilkan notifikasi sementara di bagian bawah layar.                       |
+### `Navigator.pushReplacement()`
+- Mengganti halaman saat ini dengan halaman baru di *navigation stack*.
+- Halaman sebelumnya dihapus, jadi pengguna tidak bisa kembali ke sana.
+- Cocok digunakan untuk skenario seperti:
+  - Setelah login, mengganti halaman login dengan halaman beranda (supaya user tidak bisa kembali ke login).
+  - Setelah menambahkan produk berhasil, mengganti halaman form dengan halaman daftar produk.
 
-## 3. Apa fungsi dari widget MaterialApp? Mengapa sering digunakan sebagai widget root?
-MaterialApp adalah widget utama yang:
-- Mengatur tema, warna, dan gaya global aplikasi.
-- Mengatur navigasi antar halaman (routes dan Navigator).
-- Menyediakan dukungan Material Design seperti tombol, AppBar, dan animasi bawaan.
+## 2. Bagaimana kamu memanfaatkan hierarchy widget seperti Scaffold, AppBar, dan Drawer untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
 
-## 4. Jelaskan perbedaan antara StatelessWidget dan StatefulWidget. Kapan kamu memilih salah satunya?
+Struktur dasar setiap halaman di aplikasi ini menggunakan kombinasi widget Flutter utama berikut:
 
-- StatelessWidget: Tidak memiliki state yang dapat berubah. UI hanya bergantung pada data statis atau input dari luar.	
+### `Scaffold`
+- Menjadi kerangka utama untuk setiap halaman.
+- Menyediakan area standar untuk `AppBar`, `Drawer`, `body`, dan `FloatingActionButton`.
 
-Digunakan saat: Digunakan untuk tampilan yang tidak berubah selama runtime, misalnya Text, Icon, atau halaman statis.
+### `AppBar`
+- Menampilkan judul halaman dan ikon navigasi.
+- Memberikan konsistensi di seluruh aplikasi.
 
-- StatefulWidget: Memiliki state (data internal) yang bisa berubah saat aplikasi berjalan, dan akan memicu rebuild UI saat state berubah.	
+### `Drawer`
+- Berisi menu navigasi ke berbagai halaman (Home, Tambah Produk, Tentang Aplikasi).
+- Membuat navigasi antar-halaman lebih mudah dan seragam.
 
-Digunakan saat: Digunakan untuk tampilan dinamis, misalnya form input, animasi, atau tombol dengan perubahan kondisi.
+## 3. Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti Padding, SingleChildScrollView, dan ListView saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
 
-## 5. Apa itu BuildContext dan mengapa penting di Flutter? Bagaimana penggunaannya di metode build?
-BuildContext adalah objek yang merepresentasikan posisi widget dalam widget tree.
-Setiap widget punya BuildContext sendiri, yang dipakai untuk:
-- Mengakses data dari widget di atasnya (misalnya Theme.of(context)).
-- Melakukan navigasi (Navigator.push(context, ...)).
-- Menampilkan widget seperti SnackBar lewat ScaffoldMessenger.of(context).
+### `Padding`
+- Memberikan ruang di sekitar widget agar tampilan tidak terlalu rapat.
+Contoh: Menambahkan padding di sekitar TextFormField pada form produk.
+
+### `SingleChildScrollView`
+- Membuat konten halaman bisa digulir ke bawah (scroll) saat banyak elemen form.
+- Mencegah overflow error saat keyboard muncul di layar kecil.
+
+### `ListView`
+- Digunakan untuk menampilkan daftar produk yang dinamis dan bisa di-scroll.
+- Cocok untuk menampilkan banyak data seperti katalog produk.
+
+## 4.  Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
+Untuk menjaga konsistensi visual, aplikasi Football Shop menggunakan tema global yang ditentukan melalui ThemeData di MaterialApp. Warna hijau dipilih karena identik dengan lapangan sepak bola, sehingga menciptakan identitas visual kuat dan konsisten di seluruh aplikasi.
