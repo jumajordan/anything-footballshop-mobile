@@ -2,52 +2,82 @@ Nama: Juma Jordan Bimo Simanjuntak
 NPM: 2406435843
 Kelas: F
 
+### 1. Mengapa kita perlu membuat model Dart saat mengambil/mengirim data JSON? Apa konsekuensinya jika langsung memetakan Map<String, dynamic>?
+Kita perlu membuat model Dart untuk mengubah data mentah (JSON/Map) menjadi objek yang terstruktur dan bertipe kuat (strongly-typed).
 
-## 1. Jelaskan perbedaan antara Navigator.push() dan Navigator.pushReplacement() pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
+Manfaat: Membantu type safety (mencegah error tipe data saat kompilasi), autocompletion di IDE, dan struktur kode yang lebih rapi.
 
-### `Navigator.push()`
-- Menambahkan (mendorong) halaman baru ke atas *navigation stack*.
-- Halaman sebelumnya tetap ada di bawahnya, sehingga pengguna bisa kembali dengan tombol "Back".
-- Cocok digunakan untuk transisi normal antar-halaman, misalnya:
-  - Dari halaman daftar produk ke halaman detail produk.
-  - Dari menu utama ke form tambah produk.
+Konsekuensi tanpa model:
 
-### `Navigator.pushReplacement()`
-- Mengganti halaman saat ini dengan halaman baru di *navigation stack*.
-- Halaman sebelumnya dihapus, jadi pengguna tidak bisa kembali ke sana.
-- Cocok digunakan untuk skenario seperti:
-  - Setelah login, mengganti halaman login dengan halaman beranda (supaya user tidak bisa kembali ke login).
-  - Setelah menambahkan produk berhasil, mengganti halaman form dengan halaman daftar produk.
+Validasi Tipe: Kita tidak tahu apakah suatu field itu int atau String sampai runtime, yang rentan crash.
 
-## 2. Bagaimana kamu memanfaatkan hierarchy widget seperti Scaffold, AppBar, dan Drawer untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
+Null-safety: Sulit menangani nilai null secara konsisten.
 
-Struktur dasar setiap halaman di aplikasi ini menggunakan kombinasi widget Flutter utama berikut:
+Maintainability: Kode menjadi sulit dibaca dan dikelola karena kita harus mengakses data dengan string key manual (contoh: data['fields']['price']) yang rawan typo.
 
-### `Scaffold`
-- Menjadi kerangka utama untuk setiap halaman.
-- Menyediakan area standar untuk `AppBar`, `Drawer`, `body`, dan `FloatingActionButton`.
+### 2. Apa fungsi package http dan CookieRequest? Perbedaan perannya?
+http: Package dasar Flutter untuk melakukan permintaan HTTP (GET, POST, dll.) ke server. Ini digunakan untuk komunikasi jaringan standar.
 
-### `AppBar`
-- Menampilkan judul halaman dan ikon navigasi.
-- Memberikan konsistensi di seluruh aplikasi.
+CookieRequest (dari pbp_django_auth): Wrapper atau kelas khusus yang dirancang untuk menangani sesi dan autentikasi dengan Django.
 
-### `Drawer`
-- Berisi menu navigasi ke berbagai halaman (Home, Tambah Produk, Tentang Aplikasi).
-- Membuat navigasi antar-halaman lebih mudah dan seragam.
+Perbedaan: http bersifat stateless (tidak menyimpan sesi/cookie antar request secara otomatis), sedangkan CookieRequest secara otomatis menyimpan dan menyertakan cookies (seperti sessionid dan csrftoken) di setiap permintaan. Ini sangat krusial untuk mengakses halaman yang butuh login di Django.
 
-## 3. Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti Padding, SingleChildScrollView, dan ListView saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
+### 3. Mengapa instance CookieRequest perlu dibagikan ke semua komponen?
+Agar status login (sesi) pengguna konsisten di seluruh aplikasi. Jika setiap halaman membuat instance CookieRequest baru, maka sesi login akan hilang karena cookies tidak tersimpan antar halaman. Dengan membagikannya (menggunakan Provider), semua widget mengakses objek sesi yang sama.
 
-### `Padding`
-- Memberikan ruang di sekitar widget agar tampilan tidak terlalu rapat.
-Contoh: Menambahkan padding di sekitar TextFormField pada form produk.
+### 4. Jelaskan konfigurasi konektivitas (10.0.2.2, CORS, ALLOWED_HOSTS, Internet Perms).
+10.0.2.2: Ini adalah alamat IP khusus yang digunakan oleh Android Emulator untuk mengakses localhost komputer host. Emulator menganggap localhost (127.0.0.1) sebagai dirinya sendiri.
 
-### `SingleChildScrollView`
-- Membuat konten halaman bisa digulir ke bawah (scroll) saat banyak elemen form.
-- Mencegah overflow error saat keyboard muncul di layar kecil.
+ALLOWED_HOSTS: Django memblokir host yang tidak dikenal demi keamanan. Kita harus menambahkan 10.0.2.2 agar Django menerima request dari emulator.
 
-### `ListView`
-- Digunakan untuk menampilkan daftar produk yang dinamis dan bisa di-scroll.
-- Cocok untuk menampilkan banyak data seperti katalog produk.
+CORS (Cross-Origin Resource Sharing): Mengizinkan browser/aplikasi dari domain berbeda (Flutter app dianggap berbeda origin) untuk mengakses resource server.
 
-## 4.  Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
-Untuk menjaga konsistensi visual, aplikasi Football Shop menggunakan tema global yang ditentukan melalui ThemeData di MaterialApp. Warna hijau dipilih karena identik dengan lapangan sepak bola, sehingga menciptakan identitas visual kuat dan konsisten di seluruh aplikasi.
+Internet Permission (AndroidManifest.xml): Android secara default memblokir akses internet aplikasi. Kita harus menambahkan <uses-permission android:name="android.permission.INTERNET" /> agar aplikasi bisa mengirim request.
+
+Jika tidak dikonfigurasi: Aplikasi Flutter akan mengalami error koneksi (misal SocketException atau 403 Forbidden) dan tidak bisa mengambil data dari server.
+
+### 5. Jelaskan mekanisme pengiriman data (Input -> Tampil).
+`Input:` Pengguna memasukkan data di form Flutter.
+`Serialisasi:` Data input diubah menjadi format JSON.
+`Request:` Flutter (via CookieRequest) mengirim HTTP POST request membawa JSON tersebut ke endpoint Django.
+`Processing` (Django): Django menerima request, memvalidasi data, dan menyimpannya ke database.
+`Fetching:` Untuk menampilkan, Flutter mengirim HTTP GET request ke endpoint JSON Django.
+`Deserialisasi:` Flutter menerima respon JSON, lalu mengubahnya menjadi objek Dart (Model).
+`Display:` Data objek ditampilkan ke UI menggunakan widget seperti ListView atau Text.
+
+### 6. Jelaskan mekanisme autentikasi (Login -> Logout).
+`Login:`
+- User input username/password di Flutter.
+- CookieRequest.login() mengirim kredensial ke endpoint Django /auth/login/.
+- Django memverifikasi (autentikasi). Jika valid, Django membuat session dan mengembalikan cookie sessionid.
+- CookieRequest menyimpan cookie ini.
+- Flutter mengubah tampilan ke halaman utama (Menu).
+
+`Sesi:` Setiap request berikutnya (misal ambil daftar produk) akan menyertakan cookie sessionid tersebut, sehingga Django tahu user mana yang sedang aktif.
+
+`Logout:`
+- User menekan tombol logout.
+- CookieRequest.logout() memanggil endpoint /auth/logout/.
+- Django menghapus sesi di server.
+- CookieRequest menghapus cookie lokal.
+- Flutter mengarahkan kembali ke halaman Login.
+
+### 7. Implementasi Step-by-Step Checklist
+1. `Setup: Menambahkan dependensi provider, pbp_django_auth, http di pubspec.yaml.`
+2. `Model: Membuat product.dart berdasarkan struktur JSON Django (fields: name, price, etc.).`
+3. `Auth:`
+    - Membuat login.dart dan register.dart menggunakan widget Form dan CookieRequest untuk komunikasi ke API Django (/login/, /register/).
+    - Mengatur main.dart menggunakan Provider untuk CookieRequest.
+
+4. `Product List:`
+    - Membuat list_product.dart dengan FutureBuilder yang memanggil endpoint JSON Django.
+    - Melakukan parsing JSON ke list objek Product.
+    - Menampilkan data dalam ListView.
+
+5. `Detail Page:`
+    - Membuat detail_product.dart yang menerima parameter objek Product.
+    - Menampilkan seluruh atribut produk dan tombol kembali (Navigator.pop).
+
+6. `Navigasi:`
+    - Menambahkan menu "Login", "Register", "Logout" di menu.dart dan left_drawer.dart.
+    - Menghubungkan "Daftar Produk" ke list_product.dart.
