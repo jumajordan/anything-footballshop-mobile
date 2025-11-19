@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:anything_footballshop/widgets/left_drawer.dart';
+import 'package:anything_footballshop/widgets/product_card.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
-  final String nama = "Juma Jordan Bimo Simanjuntak"; 
+  final String nama = "Juma Jordan Bimo Simanjuntak";
   final String npm = "2406435843";
-  final String kelas = "F"; 
+  final String kelas = "F";
   final List<ItemHomepage> items = [
     ItemHomepage("All Products", Icons.store),
     ItemHomepage("My Products", Icons.person),
     ItemHomepage("Create Product", Icons.add),
+    ItemHomepage("Logout", Icons.logout),
   ];
   @override
-    Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Anything FootballShop',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      drawer: LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -76,9 +77,8 @@ class MyHomePage extends StatelessWidget {
 }
 
 class InfoCard extends StatelessWidget {
-
-  final String title;  
-  final String content;  
+  final String title;
+  final String content;
 
   const InfoCard({super.key, required this.title, required this.content});
 
@@ -87,14 +87,11 @@ class InfoCard extends StatelessWidget {
     return Card(
       elevation: 2.0,
       child: Container(
-        width: MediaQuery.of(context).size.width / 3.5, 
+        width: MediaQuery.of(context).size.width / 3.5,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8.0),
             Text(content),
           ],
@@ -105,68 +102,9 @@ class InfoCard extends StatelessWidget {
 }
 
 class ItemHomepage {
- final String name;
- final IconData icon;
+  final String name;
+  final IconData icon;
 
- ItemHomepage(this.name, this.icon);
+  ItemHomepage(this.name, this.icon);
 }
 
-class ItemCard extends StatelessWidget {
-  final ItemHomepage item;
-
-  const ItemCard(this.item, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    Color backgroundColor;
-
-    switch (item.name) {
-      case "All Products":
-        backgroundColor = Colors.blue;
-        break;
-      case "My Products":
-        backgroundColor = Colors.green;
-        break;
-      case "Create Product":
-        backgroundColor = Colors.red;
-        break;
-      default:
-        backgroundColor = Theme.of(context).colorScheme.secondary;
-    }
-
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!")),
-            );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
-                ),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
